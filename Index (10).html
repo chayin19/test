@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>คอร์สพื้นฐาน VS Code</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#111827; --card:#1f2937; --line:#334155;
+    --text:#e5e7eb; --muted:#94a3b8; --brand:#0ea5e9; --brand2:#22d3ee;
+    --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Sarabun","Segoe UI",Tahoma,sans-serif;
+       background:linear-gradient(180deg,#0b1224,#0f172a);color:var(--text);line-height:1.7}
+  header{padding:28px 20px;background:linear-gradient(120deg,#0369a1,#0e7490);
+         box-shadow:0 6px 24px rgba(0,0,0,.35)}
+  header h1{margin:0;font-size:28px}
+  header p{margin:6px 0 0;color:#e0f2fe}
+  .layout{display:grid;grid-template-columns:280px 1fr;gap:20px;max-width:1200px;
+          margin:24px auto;padding:0 16px}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}}
+  nav.toc{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+          padding:14px;position:sticky;top:12px;align-self:start;max-height:90vh;overflow:auto}
+  nav.toc h3{margin:6px 8px 12px;color:var(--brand2);font-size:15px;letter-spacing:.5px;text-transform:uppercase}
+  nav.toc a{display:block;color:var(--text);text-decoration:none;padding:8px 10px;border-radius:8px;font-size:14px}
+  nav.toc a:hover{background:#0b3a55}
+  nav.toc a.done::after{content:" ✓";color:var(--ok)}
+  main{min-width:0}
+  section.lesson{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+                 padding:22px;margin-bottom:18px;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+  section.lesson h2{margin:0 0 6px;color:var(--brand2)}
+  section.lesson .meta{color:var(--muted);font-size:13px;margin-bottom:14px}
+  h3{color:#7dd3fc;margin-top:22px}
+  code,kbd{background:#0b1224;border:1px solid #1f2a44;padding:2px 6px;border-radius:6px;
+           font-family:Consolas,Menlo,monospace;font-size:13px;color:#fde68a}
+  kbd{box-shadow:inset 0 -2px 0 #00000055;color:#fff}
+  pre{background:#0b1224;border:1px solid #1f2a44;border-radius:10px;padding:14px;overflow:auto}
+  pre code{background:none;border:none;color:#e2e8f0;padding:0}
+  .tip{border-left:4px solid var(--brand);background:#082f49;padding:10px 14px;border-radius:8px;margin:12px 0}
+  .warn{border-left:4px solid var(--warn);background:#3b2a07;padding:10px 14px;border-radius:8px;margin:12px 0}
+  ul{padding-left:22px} li{margin:4px 0}
+  .exercise{background:var(--card);border:1px dashed #475569;border-radius:12px;padding:16px;margin-top:14px}
+  .exercise h4{margin:0 0 8px;color:#fde68a}
+  .q{margin:14px 0}
+  .options label{display:block;background:#0b1224;border:1px solid #1f2a44;border-radius:8px;
+                 padding:8px 12px;margin:6px 0;cursor:pointer}
+  .options label:hover{border-color:var(--brand)}
+  .options input{margin-right:8px}
+  textarea,input[type=text]{width:100%;background:#0b1224;color:var(--text);
+        border:1px solid #1f2a44;border-radius:8px;padding:10px;font-family:Consolas,monospace}
+  button{background:var(--brand);color:#001018;border:none;border-radius:10px;
+         padding:10px 16px;font-weight:700;cursor:pointer}
+  button.ghost{background:transparent;color:var(--brand2);border:1px solid var(--brand2)}
+  button:hover{filter:brightness(1.1)}
+  .feedback{margin-top:10px;padding:10px;border-radius:8px;font-weight:600;display:none}
+  .feedback.ok{background:#052e1a;color:#86efac;border:1px solid #14532d;display:block}
+  .feedback.bad{background:#3b0a0a;color:#fca5a5;border:1px solid #7f1d1d;display:block}
+  .progress{background:#0b1224;border:1px solid #1f2a44;height:10px;border-radius:99px;overflow:hidden;margin-top:8px}
+  .progress > div{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));width:0%}
+  footer{color:var(--muted);text-align:center;padding:24px;font-size:13px}
+  .pill{display:inline-block;background:#0369a1;color:#fff;border-radius:99px;padding:2px 10px;font-size:12px;margin-left:6px}
+  table{border-collapse:collapse;width:100%;margin:8px 0}
+  th,td{border:1px solid #334155;padding:8px;text-align:left;font-size:14px}
+  th{background:#0b1224;color:#7dd3fc}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎓 คอร์สพื้นฐาน Visual Studio Code (ภาษาไทย)</h1>
+  <p>เรียนรู้ตั้งแต่เริ่มต้นใช้งาน VS Code พร้อมแบบฝึกหัดทดลองทำในเว็บนี้ทันที</p>
+  <div class="progress"><div id="progressBar"></div></div>
+  <div style="color:#e0f2fe;font-size:13px;margin-top:6px" id="progressText">ความคืบหน้า: 0%</div>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <h3>เนื้อหา</h3>
+    <a href="#l1">1. VS Code คืออะไร</a>
+    <a href="#l2">2. ติดตั้งและเปิดใช้งานครั้งแรก</a>
+    <a href="#l3">3. รู้จักหน้าจอ (UI)</a>
+    <a href="#l4">4. การเปิดไฟล์และโฟลเดอร์</a>
+    <a href="#l5">5. แก้ไขข้อความ &amp; คีย์ลัด</a>
+    <a href="#l6">6. ค้นหาและแทนที่</a>
+    <a href="#l7">7. Extensions ที่ควรติดตั้ง</a>
+    <a href="#l8">8. Terminal ในตัว</a>
+    <a href="#l9">9. ใช้ Git เบื้องต้น</a>
+    <a href="#l10">10. Debug เบื้องต้น</a>
+    <a href="#final">🏁 แบบทดสอบรวม</a>
+    <hr style="border-color:#334155;margin:10px 0">
+    <button class="ghost" id="resetBtn" style="width:100%">รีเซ็ตความคืบหน้า</button>
+  </nav>
+
+  <main>
+    <!-- LESSON 1 -->
+    <section class="lesson" id="l1" data-id="l1">
+      <h2>บทที่ 1 · VS Code คืออะไร <span class="pill">เริ่มต้น</span></h2>
+      <div class="meta">เข้าใจว่า VS Code คือเครื่องมืออะไร และทำไมโปรแกรมเมอร์ทั่วโลกเลือกใช้</div>
+      <p><b>Visual Studio Code (VS Code)</b> คือโปรแกรมแก้ไขโค้ด (Code Editor) ฟรีจาก Microsoft 
+      ทำงานได้ทั้ง Windows, macOS และ Linux รองรับภาษาโปรแกรมแทบทุกภาษา 
+      มีระบบส่วนเสริม (Extensions) จำนวนมาก ทำให้ปรับแต่งได้ตามต้องการ</p>
+      <h3>จุดเด่นที่ควรรู้</h3>
+      <ul>
+        <li>เบา เปิดเร็ว ใช้ทรัพยากรน้อย</li>
+        <li>มี IntelliSense ช่วยเติมโค้ดอัตโนมัติ</li>
+        <li>มี Terminal และ Git ในตัว</li>
+        <li>มี Extensions หลายหมื่นตัวให้เลือก</li>
+      </ul>
+      <div class="tip">💡 VS Code ไม่ใช่ Visual Studio (IDE ของ Microsoft) — เป็นคนละโปรแกรมกัน</div>
+
+      <div class="exercise" data-ex="ex1">
+        <h4>🧪 แบบฝึกหัด 1</h4>
+        <div class="q">VS Code พัฒนาโดยบริษัทใด?</div>
+        <div class="options">
+          <label><input type="radio" name="ex1" value="a"> Google</label>
+          <label><input type="radio" name="ex1" value="b"> Microsoft</label>
+          <label><input type="radio" name="ex1" value="c"> Apple</label>
+          <label><input type="radio" name="ex1" value="d"> JetBrains</label>
+        </div>
+        <button onclick="checkRadio('ex1','b')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex1"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 2 -->
+    <section class="lesson" id="l2" data-id="l2">
+      <h2>บทที่ 2 · ติดตั้งและเปิดใช้งานครั้งแรก</h2>
+      <div class="meta">ดาวน์โหลด ติดตั้ง และตั้งค่าภาษาไทย</div>
+      <ol>
+        <li>ไปที่เว็บไซต์ <code>https://code.visualstudio.com</code></li>
+        <li>กดปุ่ม <b>Download</b> ตามระบบปฏิบัติการของคุณ</li>
+        <li>ติดตั้งโดยกด Next ไปจนเสร็จ (แนะนำให้ติ๊ก “Add to PATH”)</li>
+        <li>เปิดโปรแกรม จะเห็นหน้า Welcome</li>
+      </ol>
+      <h3>เปลี่ยนเป็นภาษาไทย (ออปชัน)</h3>
+      <ol>
+        <li>กด <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> เปิด Command Palette</li>
+        <li>พิมพ์ <code>Configure Display Language</code></li>
+        <li>เลือก <b>Install additional languages...</b> แล้วเลือก <b>Thai</b></li>
+        <li>กด Restart</li>
+      </ol>
+
+      <div class="exercise" data-ex="ex2">
+        <h4>🧪 แบบฝึกหัด 2</h4>
+        <div class="q">คีย์ลัดเปิด Command Palette คือ?</div>
+        <div class="options">
+          <label><input type="radio" name="ex2" value="a"> Ctrl + P</label>
+          <label><input type="radio" name="ex2" value="b"> Ctrl + Shift + P</label>
+          <label><input type="radio" name="ex2" value="c"> Alt + F4</label>
+          <label><input type="radio" name="ex2" value="d"> Ctrl + B</label>
+        </div>
+        <button onclick="checkRadio('ex2','b')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex2"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 3 -->
+    <section class="lesson" id="l3" data-id="l3">
+      <h2>บทที่ 3 · รู้จักหน้าจอ (UI)</h2>
+      <div class="meta">ส่วนประกอบหลัก 5 ส่วนของ VS Code</div>
+      <table>
+        <tr><th>ส่วน</th><th>หน้าที่</th></tr>
+        <tr><td>Activity Bar (ซ้ายสุด)</td><td>สลับมุมมอง: Explorer, Search, Git, Run, Extensions</td></tr>
+        <tr><td>Side Bar</td><td>แสดงรายละเอียดของมุมมองที่เลือก</td></tr>
+        <tr><td>Editor</td><td>พื้นที่แก้ไขไฟล์ แบ่งหลายแท็บ/หลายคอลัมน์ได้</td></tr>
+        <tr><td>Panel (ล่าง)</td><td>Terminal, Problems, Output, Debug Console</td></tr>
+        <tr><td>Status Bar</td><td>แสดง Git branch, ภาษาไฟล์, encoding, ตำแหน่ง cursor</td></tr>
+      </table>
+      <div class="tip">💡 ซ่อน/แสดง Side Bar ด้วย <kbd>Ctrl</kbd>+<kbd>B</kbd> &nbsp; เปิด/ปิด Terminal ด้วย <kbd>Ctrl</kbd>+<kbd>`</kbd></div>
+
+      <div class="exercise" data-ex="ex3">
+        <h4>🧪 แบบฝึกหัด 3</h4>
+        <div class="q">ส่วนที่ใช้ดูไฟล์ในโฟลเดอร์โปรเจกต์เรียกว่าอะไร?</div>
+        <div class="options">
+          <label><input type="radio" name="ex3" value="a"> Status Bar</label>
+          <label><input type="radio" name="ex3" value="b"> Panel</label>
+          <label><input type="radio" name="ex3" value="c"> Explorer</label>
+          <label><input type="radio" name="ex3" value="d"> Minimap</label>
+        </div>
+        <button onclick="checkRadio('ex3','c')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex3"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 4 -->
+    <section class="lesson" id="l4" data-id="l4">
+      <h2>บทที่ 4 · การเปิดไฟล์และโฟลเดอร์</h2>
+      <ul>
+        <li>เปิดไฟล์เดี่ยว: <b>File &gt; Open File</b> หรือ <kbd>Ctrl</kbd>+<kbd>O</kbd></li>
+        <li>เปิดทั้งโฟลเดอร์ (แนะนำ): <b>File &gt; Open Folder</b> หรือ <kbd>Ctrl</kbd>+<kbd>K</kbd> <kbd>Ctrl</kbd>+<kbd>O</kbd></li>
+        <li>สร้างไฟล์ใหม่ใน Explorer: คลิกขวา &gt; New File</li>
+        <li>บันทึก: <kbd>Ctrl</kbd>+<kbd>S</kbd> · บันทึกทั้งหมด: <kbd>Ctrl</kbd>+<kbd>K</kbd> <kbd>S</kbd></li>
+      </ul>
+      <div class="warn">⚠️ ควรเปิดเป็น “โฟลเดอร์โปรเจกต์” เสมอ เพื่อให้ Git, Extensions และการค้นหาทำงานได้ครบ</div>
+
+      <div class="exercise" data-ex="ex4">
+        <h4>🧪 แบบฝึกหัด 4 — เติมคำ</h4>
+        <div class="q">คีย์ลัดบันทึกไฟล์ปัจจุบันคือ <code>Ctrl + ?</code> — พิมพ์ตัวอักษรเดียว</div>
+        <input type="text" id="ex4-input" placeholder="พิมพ์ตัวอักษรที่ขาด" maxlength="2">
+        <div style="margin-top:8px"><button onclick="checkText('ex4','ex4-input',['s'])">ตรวจคำตอบ</button></div>
+        <div class="feedback" id="fb-ex4"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 5 -->
+    <section class="lesson" id="l5" data-id="l5">
+      <h2>บทที่ 5 · แก้ไขข้อความ &amp; คีย์ลัดสำคัญ</h2>
+      <table>
+        <tr><th>คีย์ลัด</th><th>การทำงาน</th></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>คัดลอก / วาง</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>เลิกทำ / ทำซ้ำ</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>เลือกคำเดียวกันถัดไป (Multi-cursor)</td></tr>
+        <tr><td><kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td><td>ย้ายบรรทัดขึ้น/ลง</td></tr>
+        <tr><td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>↓</kbd></td><td>ก๊อปบรรทัดลงด้านล่าง</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>คอมเมนต์/ยกเลิกคอมเมนต์</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td><td>ลบทั้งบรรทัด</td></tr>
+        <tr><td><kbd>F2</kbd></td><td>เปลี่ยนชื่อตัวแปร/ฟังก์ชันทั้งโปรเจกต์</td></tr>
+      </table>
+
+      <div class="exercise" data-ex="ex5">
+        <h4>🧪 แบบฝึกหัด 5</h4>
+        <div class="q">คีย์ลัดเลือกคำเดียวกันถัดไปเพื่อแก้พร้อมกันคือ?</div>
+        <div class="options">
+          <label><input type="radio" name="ex5" value="a"> Ctrl + D</label>
+          <label><input type="radio" name="ex5" value="b"> Ctrl + F</label>
+          <label><input type="radio" name="ex5" value="c"> Ctrl + L</label>
+          <label><input type="radio" name="ex5" value="d"> Ctrl + A</label>
+        </div>
+        <button onclick="checkRadio('ex5','a')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex5"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 6 -->
+    <section class="lesson" id="l6" data-id="l6">
+      <h2>บทที่ 6 · ค้นหาและแทนที่</h2>
+      <ul>
+        <li>ค้นหาในไฟล์: <kbd>Ctrl</kbd>+<kbd>F</kbd></li>
+        <li>แทนที่ในไฟล์: <kbd>Ctrl</kbd>+<kbd>H</kbd></li>
+        <li>ค้นหาทั้งโปรเจกต์: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></li>
+        <li>ไปที่ไฟล์อย่างรวดเร็ว: <kbd>Ctrl</kbd>+<kbd>P</kbd></li>
+        <li>ไปบรรทัดที่ต้องการ: <kbd>Ctrl</kbd>+<kbd>G</kbd></li>
+      </ul>
+      <div class="tip">💡 ในกล่องค้นหา กดปุ่ม <b>.*</b> เพื่อใช้ Regex, <b>Aa</b> สำหรับ case-sensitive</div>
+
+      <div class="exercise" data-ex="ex6">
+        <h4>🧪 แบบฝึกหัด 6</h4>
+        <div class="q">ต้องการค้นหาคำว่า <code>username</code> ในทุกไฟล์ของโปรเจกต์ ใช้คีย์ลัดใด?</div>
+        <div class="options">
+          <label><input type="radio" name="ex6" value="a"> Ctrl + F</label>
+          <label><input type="radio" name="ex6" value="b"> Ctrl + H</label>
+          <label><input type="radio" name="ex6" value="c"> Ctrl + Shift + F</label>
+          <label><input type="radio" name="ex6" value="d"> Ctrl + P</label>
+        </div>
+        <button onclick="checkRadio('ex6','c')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex6"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 7 -->
+    <section class="lesson" id="l7" data-id="l7">
+      <h2>บทที่ 7 · Extensions ที่ควรติดตั้ง</h2>
+      <p>เปิดมุมมอง Extensions ด้วย <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd></p>
+      <ul>
+        <li><b>Prettier</b> — จัดรูปแบบโค้ดอัตโนมัติ</li>
+        <li><b>ESLint</b> — ตรวจ error สำหรับ JavaScript/TypeScript</li>
+        <li><b>Live Server</b> — เปิดเว็บ HTML แบบ auto-reload</li>
+        <li><b>GitLens</b> — ดูประวัติ Git ละเอียดขึ้น</li>
+        <li><b>Path Intellisense</b> — เติม path ไฟล์อัตโนมัติ</li>
+        <li><b>Material Icon Theme</b> — เปลี่ยนไอคอนไฟล์ให้สวยงาม</li>
+      </ul>
+
+      <div class="exercise" data-ex="ex7">
+        <h4>🧪 แบบฝึกหัด 7 — เลือกได้หลายข้อ</h4>
+        <div class="q">Extension ใดบ้างที่ใช้สำหรับ <b>จัดรูปแบบโค้ด</b> และ <b>ตรวจ error ของ JavaScript</b>?</div>
+        <div class="options">
+          <label><input type="checkbox" name="ex7" value="prettier"> Prettier</label>
+          <label><input type="checkbox" name="ex7" value="eslint"> ESLint</label>
+          <label><input type="checkbox" name="ex7" value="liveserver"> Live Server</label>
+          <label><input type="checkbox" name="ex7" value="icon"> Material Icon Theme</label>
+        </div>
+        <button onclick="checkChecks('ex7',['prettier','eslint'])">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex7"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 8 -->
+    <section class="lesson" id="l8" data-id="l8">
+      <h2>บทที่ 8 · Terminal ในตัว</h2>
+      <ul>
+        <li>เปิด/ปิด Terminal: <kbd>Ctrl</kbd>+<kbd>`</kbd> (แป้นข้างเลข 1)</li>
+        <li>เปิดหลาย Terminal: กดปุ่ม <b>+</b> ที่มุมขวาของ Panel</li>
+        <li>เปลี่ยน shell ได้: PowerShell / Cmd / Git Bash / WSL</li>
+      </ul>
+      <p>ตัวอย่างคำสั่งพื้นฐาน:</p>
+<pre><code>node -v        # ตรวจสอบเวอร์ชัน Node.js
+npm init -y    # สร้างไฟล์ package.json
+npm install    # ติดตั้ง dependencies
+git status     # ดูสถานะ Git</code></pre>
+
+      <div class="exercise" data-ex="ex8">
+        <h4>🧪 แบบฝึกหัด 8</h4>
+        <div class="q">คีย์ลัดเปิด Terminal ใน VS Code คือ?</div>
+        <div class="options">
+          <label><input type="radio" name="ex8" value="a"> Ctrl + T</label>
+          <label><input type="radio" name="ex8" value="b"> Ctrl + `</label>
+          <label><input type="radio" name="ex8" value="c"> Ctrl + Alt + T</label>
+          <label><input type="radio" name="ex8" value="d"> F5</label>
+        </div>
+        <button onclick="checkRadio('ex8','b')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex8"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 9 -->
+    <section class="lesson" id="l9" data-id="l9">
+      <h2>บทที่ 9 · ใช้ Git เบื้องต้นใน VS Code</h2>
+      <ol>
+        <li>ติดตั้ง Git ที่ <code>https://git-scm.com</code></li>
+        <li>เปิดโฟลเดอร์โปรเจกต์ใน VS Code</li>
+        <li>คลิกไอคอน <b>Source Control</b> (รูปแยกกิ่ง) ที่ Activity Bar</li>
+        <li>กด <b>Initialize Repository</b></li>
+        <li>เขียน commit message แล้วกด ✓ เพื่อ commit</li>
+      </ol>
+      <p>คำสั่ง Git ใน Terminal ที่ใช้บ่อย:</p>
+<pre><code>git init
+git add .
+git commit -m "first commit"
+git remote add origin &lt;URL&gt;
+git push -u origin main</code></pre>
+
+      <div class="exercise" data-ex="ex9">
+        <h4>🧪 แบบฝึกหัด 9 — เติมคำสั่ง</h4>
+        <div class="q">คำสั่งสำหรับ “บันทึกการเปลี่ยนแปลง” พร้อมข้อความ คือ <code>git ____ -m "msg"</code></div>
+        <input type="text" id="ex9-input" placeholder="พิมพ์คำสั่ง">
+        <div style="margin-top:8px"><button onclick="checkText('ex9','ex9-input',['commit'])">ตรวจคำตอบ</button></div>
+        <div class="feedback" id="fb-ex9"></div>
+      </div>
+    </section>
+
+    <!-- LESSON 10 -->
+    <section class="lesson" id="l10" data-id="l10">
+      <h2>บทที่ 10 · Debug เบื้องต้น</h2>
+      <ul>
+        <li>คลิกไอคอน <b>Run and Debug</b> ที่ Activity Bar (หรือ <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>)</li>
+        <li>คลิกซ้ายข้างเลขบรรทัด เพื่อตั้ง <b>Breakpoint</b> (จุดสีแดง)</li>
+        <li>กด <kbd>F5</kbd> เพื่อเริ่ม Debug</li>
+        <li>ปุ่มควบคุมหลัก: Continue (F5), Step Over (F10), Step Into (F11)</li>
+      </ul>
+      <div class="tip">💡 ใช้ <b>Debug Console</b> พิมพ์ตัวแปรเพื่อดูค่าระหว่าง debug ได้เลย</div>
+
+      <div class="exercise" data-ex="ex10">
+        <h4>🧪 แบบฝึกหัด 10</h4>
+        <div class="q">ปุ่มใดใช้เริ่ม Debug?</div>
+        <div class="options">
+          <label><input type="radio" name="ex10" value="a"> F2</label>
+          <label><input type="radio" name="ex10" value="b"> F5</label>
+          <label><input type="radio" name="ex10" value="c"> F12</label>
+          <label><input type="radio" name="ex10" value="d"> Ctrl + R</label>
+        </div>
+        <button onclick="checkRadio('ex10','b')">ตรวจคำตอบ</button>
+        <div class="feedback" id="fb-ex10"></div>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="lesson" id="final" data-id="final">
+      <h2>🏁 แบบทดสอบรวม</h2>
+      <p>ตอบคำถามทั้งหมดให้ถูกเพื่อรับใบประกาศ (จำลอง)</p>
+
+      <div class="q"><b>1.</b> เปิด/ปิด Side Bar ด้วยคีย์ลัด?
+        <div class="options">
+          <label><input type="radio" name="f1" value="a"> Ctrl + B</label>
+          <label><input type="radio" name="f1" value="b"> Ctrl + J</label>
+          <label><input type="radio" name="f1" value="c"> Ctrl + N</label>
+        </div>
+      </div>
+      <div class="q"><b>2.</b> ค้นหาทั้งโปรเจกต์ใช้คีย์ลัด?
+        <div class="options">
+          <label><input type="radio" name="f2" value="a"> Ctrl + F</label>
+          <label><input type="radio" name="f2" value="b"> Ctrl + Shift + F</label>
+          <label><input type="radio" name="f2" value="c"> Ctrl + P</label>
+        </div>
+      </div>
+      <div class="q"><b>3.</b> ตั้ง Breakpoint ทำอย่างไร?
+        <div class="options">
+          <label><input type="radio" name="f3" value="a"> คลิกซ้ายข้างเลขบรรทัด</label>
+          <label><input type="radio" name="f3" value="b"> กด Ctrl + S</label>
+          <label><input type="radio" name="f3" value="c"> ลากไฟล์ไปที่ Editor</label>
+        </div>
+      </div>
+      <button onclick="finalCheck()">ส่งคำตอบ</button>
+      <div class="feedback" id="fb-final"></div>
+    </section>
+
+    <footer>
+      ✨ จัดทำด้วย Google Apps Script · เรียนรู้ VS Code ให้สนุกนะครับ
+    </footer>
+  </main>
+</div>
+
+<script>
+  var progress = {};
+  var TOTAL = 10; // จำนวนแบบฝึกหัดหลัก (ex1..ex10)
+
+  // โหลดความคืบหน้าจาก server (ถ้ามี)
+  try {
+    google.script.run.withSuccessHandler(function(p){
+      progress = p || {};
+      updateProgress();
+      markDoneInToc();
+    }).loadProgress();
+  } catch(e){ /* รันนอก Apps Script ก็ยังใช้ได้ */ }
+
+  function persist(){
+    try { google.script.run.saveProgress(progress); } catch(e){}
+  }
+
+  function showFb(id, ok, msg){
+    var el = document.getElementById('fb-'+id);
+    el.className = 'feedback ' + (ok ? 'ok' : 'bad');
+    el.textContent = msg;
+  }
+
+  function markDone(id){
+    progress[id] = true;
+    updateProgress();
+    markDoneInToc();
+    persist();
+  }
+
+  function updateProgress(){
+    var done = 0;
+    for (var i=1;i<=TOTAL;i++) if (progress['ex'+i]) done++;
+    var pct = Math.round(done/TOTAL*100);
+    document.getElementById('progressBar').style.width = pct+'%';
+    document.getElementById('progressText').textContent = 'ความคืบหน้า: '+pct+'% ('+done+'/'+TOTAL+')';
+  }
+
+  function markDoneInToc(){
+    var links = document.querySelectorAll('nav.toc a');
+    links.forEach(function(a){
+      var href = a.getAttribute('href').replace('#','');
+      var idx = ['l1','l2','l3','l4','l5','l6','l7','l8','l9','l10'].indexOf(href);
+      if (idx>=0 && progress['ex'+(idx+1)]) a.classList.add('done');
+    });
+  }
+
+  function checkRadio(id, correct){
+    var sel = document.querySelector('input[name="'+id+'"]:checked');
+    if (!sel) return showFb(id,false,'กรุณาเลือกคำตอบก่อน');
+    if (sel.value===correct){ showFb(id,true,'✅ ถูกต้อง!'); markDone(id); }
+    else showFb(id,false,'❌ ยังไม่ถูก ลองใหม่');
+  }
+
+  function checkText(id, inputId, answers){
+    var v = (document.getElementById(inputId).value||'').trim().toLowerCase();
+    if (!v) return showFb(id,false,'กรุณาพิมพ์คำตอบ');
+    if (answers.indexOf(v)>=0){ showFb(id,true,'✅ ถูกต้อง!'); markDone(id); }
+    else showFb(id,false,'❌ ยังไม่ถูก ลองใหม่');
+  }
+
+  function checkChecks(id, correctArr){
+    var picks = Array.prototype.slice.call(document.querySelectorAll('input[name="'+id+'"]:checked')).map(function(x){return x.value;});
+    var ok = picks.length===correctArr.length && correctArr.every(function(v){return picks.indexOf(v)>=0;});
+    if (ok){ showFb(id,true,'✅ ถูกต้องครบถ้วน!'); markDone(id); }
+    else showFb(id,false,'❌ ยังไม่ครบ/ไม่ถูก ลองใหม่');
+  }
+
+  function finalCheck(){
+    var ans = {f1:'a',f2:'b',f3:'a'};
+    var score = 0;
+    for (var k in ans){
+      var sel = document.querySelector('input[name="'+k+'"]:checked');
+      if (sel && sel.value===ans[k]) score++;
+    }
+    var el = document.getElementById('fb-final');
+    if (score===3){
+      el.className='feedback ok';
+      el.innerHTML = '🎉 ยอดเยี่ยม! คุณผ่านแบบทดสอบรวม ('+score+'/3) — พร้อมเริ่มใช้ VS Code จริงแล้ว!';
+    } else {
+      el.className='feedback bad';
+      el.textContent = 'ได้ '+score+'/3 ลองทบทวนแล้วทำใหม่นะ';
+    }
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if (!confirm('ต้องการรีเซ็ตความคืบหน้าทั้งหมด?')) return;
+    progress = {};
+    persist();
+    updateProgress();
+    document.querySelectorAll('nav.toc a.done').forEach(function(a){a.classList.remove('done');});
+    document.querySelectorAll('.feedback').forEach(function(f){f.className='feedback';f.textContent='';});
+    document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(function(i){i.checked=false;});
+    document.querySelectorAll('input[type=text]').forEach(function(i){i.value='';});
+  });
+
+  updateProgress();
+</script>
+</body>
+</html>
